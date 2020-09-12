@@ -19,6 +19,16 @@ class CreatePage {
             if (request.status === 200) {
                 this.dataBase = JSON.parse(request.responseText);
                 this.init();
+            } else {
+                const heroCards = document.querySelector('.hero-cards');
+                heroCards.textContent = '';
+                heroCards.style.height = '100vh';
+                heroCards.style.justifyContent = 'center';
+                heroCards.insertAdjacentHTML('beforeend', `
+                    <h1 style='color: red; font-size: 40px;'>Что-то пошло не так!!</h1>
+                `);
+
+                console.error(request.status);
             }
         });
 
