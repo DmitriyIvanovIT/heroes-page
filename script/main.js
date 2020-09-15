@@ -85,8 +85,16 @@ class CreatePage {
                 this.createFilter();
                 this.filterFilm.addEventListener('change', () => this.filmFilter(this.filterFilm.value));
             })
-            .catch(error => console.error(error));
-
+            .catch(error => {
+                console.error(error);
+                const heroCards = document.querySelector('.hero-cards');
+                heroCards.textContent = '';
+                heroCards.style.height = '100vh';
+                heroCards.style.justifyContent = 'center';
+                heroCards.insertAdjacentHTML('beforeend', `
+                    <h1 style='color: red; font-size: 40px;'>Что-то пошло не так!!</h1>
+                `);
+            });
     }
 }
 
