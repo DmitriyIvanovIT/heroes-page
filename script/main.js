@@ -8,33 +8,8 @@ class CreatePage {
         this.filmArr = [];
     }
 
-    getData() {
-        const request = new XMLHttpRequest();
-
-        request.addEventListener('readystatechange', () => {
-            if (request.readyState !== 4) {
-                return;
-            }
-
-            if (request.status === 200) {
-                this.dataBase = JSON.parse(request.responseText);
-                this.init();
-            } else {
-                const heroCards = document.querySelector('.hero-cards');
-                heroCards.textContent = '';
-                heroCards.style.height = '100vh';
-                heroCards.style.justifyContent = 'center';
-                heroCards.insertAdjacentHTML('beforeend', `
-                    <h1 style='color: red; font-size: 40px;'>Что-то пошло не так!!</h1>
-                `);
-
-                console.error(request.status);
-            }
-        });
-
-        request.open('GET', '../db/dbHeroes.json');
-        request.setRequestHeader('Content-Type', 'application/json');
-        request.send();
+    getData(url) {
+        return fetch(url);
     }
 
     renderCard() {
@@ -64,8 +39,8 @@ class CreatePage {
     createFilter() {
         this.dataBase.forEach(item => {
             if (item.movies) {
-                item.movies.forEach (movie => {
-                    if(!this.filmArr.some(elem => elem === movie)) {
+                item.movies.forEach(movie => {
+                    if (!this.filmArr.some(elem => elem === movie)) {
                         this.filmArr.push(movie);
                     }
                 });
@@ -74,7 +49,7 @@ class CreatePage {
         this.filmArr.sort();
 
         this.filmArr.forEach(film => {
-            this.filterFilm.insertAdjacentHTML('beforeend',`<option value="${film}">${film}</option>`);
+            this.filterFilm.insertAdjacentHTML('beforeend', `<option value="${film}">${film}</option>`);
         });
     }
 
@@ -88,20 +63,32 @@ class CreatePage {
                 } else {
                     item.style.display = '';
                 }
-                
+
             });
-            
+
         } else {
             card.forEach(item => item.style.display = '');
         }
     }
 
     init() {
-        this.renderCard();
-        this.createFilter();
-        this.filterFilm.addEventListener('change', () => this.filmFilter(this.filterFilm.value));
+        this.getData('../db/dbHeroes.json')
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('status network not 200');
+                }
+                return (response.json());
+            })
+            .then(data => {
+                this.dataBase = data;
+                this.renderCard();
+                this.createFilter();
+                this.filterFilm.addEventListener('change', () => this.filmFilter(this.filterFilm.value));
+            })
+            .catch(error => console.error(error));
+
     }
 }
 
 const createPage = new CreatePage('.filter', '.cards-block');
-createPage.getData();
+createPage.init();
