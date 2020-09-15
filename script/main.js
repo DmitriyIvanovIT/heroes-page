@@ -72,7 +72,7 @@ class CreatePage {
     }
 
     init() {
-        this.getData('../db/dbHeroes.json')
+        this.getData('./db/dbHeroes.json')
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('status network not 200');
